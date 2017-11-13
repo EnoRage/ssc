@@ -1,0 +1,2 @@
+# ssc
+Solidity smart contracts 
