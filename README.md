@@ -2,6 +2,7 @@
 Solidity smart contracts
 <br>
 We are going to make some basic smart contracts to understand how to make our own solutions
+<br>
 I Master-class
 <li>
   Hello world contract
