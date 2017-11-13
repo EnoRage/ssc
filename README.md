@@ -4,14 +4,19 @@ We are going to make some basic smart contracts to understand how to make our ow
 I Master-class
 <li>
   Hello world contract
-  <br>
+</li>
+<li>
   Get/Set functions
-  <br>
+  </li>
+<li>
   Mapping
-  <br>
+  </li>
+ <li>
   Sha256 function
-  <br>
+   </li>
+<li>
   msg and address
-  <br>
+  </li>
+<li>
   Constructor 
 </li>
