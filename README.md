@@ -1,5 +1,6 @@
 # ssc
-Solidity smart contracts 
+Solidity smart contracts
+<br>
 We are going to make some basic smart contracts to understand how to make our own solutions
 I Master-class
 <li>
