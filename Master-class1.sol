@@ -14,10 +14,8 @@ contract Helloworld2 {
 
     string ourString = "Hello, world!"; // создание строки ourString и присваение значения по умолчению
 
-    string ourString2;
-
     function getData() constant returns (string) {// имя() описание, меняет ли она состояние и возвращаемое значение
-        return ourString2; // возвращает ourString
+        return ourString; // возвращает ourString
     }
 
     function setData(string newData) { // имя(тип данных название)
