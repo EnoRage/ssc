@@ -3,9 +3,9 @@ pragma solidity ^4.0.18;
 
 contract Own {
 
-     address owner;
+    address owner;
 
-     function SimpleInfo2() {
+    function SimpleInfo2() {
 
         owner = msg.sender;
     }
