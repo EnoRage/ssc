@@ -1,11 +1,11 @@
-pragma solidity ^4.0.18;
+pragma solidity ^0.4.18; 
 
 
 contract Own {
 
     address owner;
 
-    function SimpleInfo2() {
+    function Own() {
 
         owner = msg.sender;
     }
