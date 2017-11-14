@@ -17,7 +17,7 @@ contract MyInfo {
     }
 
     function setData(string key, string info) {
-        require(msg.sender == owner);
+        require(msg.sender == owner); // если условие не выполняется, то вылетаем из функции
         data[keccak256(key)] = info;
 
     }
