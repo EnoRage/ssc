@@ -43,10 +43,14 @@ contract SimpleInfo2 {
     mapping (bytes32 => string) data;  // массив data, в котором  по ключу тип bytes32 существует строка 
     
     function setData(string key, string info) { 
+
         data[keccak256(key)] = info; // присваиваем по ключу значение 
+
     }
     
     function getData(string key) constant returns(string) {
+
         return data[keccak256(key)]; // возвращаем по ключу значение
+        
     }
 }
