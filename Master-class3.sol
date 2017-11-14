@@ -27,6 +27,4 @@ contract MyInfo {
 
     }
 
-
-
 }
