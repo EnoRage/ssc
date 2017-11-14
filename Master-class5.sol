@@ -24,7 +24,7 @@ contract Own {
 }
 
 
-contract InfoSender is Own {
+contract InfoSender is Own { // наследуем контракт доступа 
 
     mapping (bytes32 => string) data;
 
