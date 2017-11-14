@@ -17,7 +17,13 @@ contract MyInfo {
     }
 
     function setData(string key, string info) {
+        require(msg.sender == owner);
+        data[keccak256(key)] = info;
 
+    }
+
+    function getData(string key) constant returns(string) {
+        return data[keccak256(key)];
 
     }
 
