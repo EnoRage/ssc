@@ -16,9 +16,9 @@ contract MyInfo {
         
     }
 
-    function setData(string key, string info){
+    function setData(string key, string info) {
 
-        
+
     }
 
 
