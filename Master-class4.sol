@@ -13,7 +13,7 @@ contract SimpleInfo {
 
     }
 
-    function sendNewOwner(address newOwner) {
+    function sendNewOwner(address newOwner) { // создаем функцию переопределения владельца 
         
         require(msg.sender == owner);
         owner = newOwner;
@@ -34,8 +34,4 @@ contract SimpleInfo {
 
     }
 
-    function transferOwnership(address newOwner) {
-        require(msg.sender == owner);
-        owner = newOwner;
-    }
 }
