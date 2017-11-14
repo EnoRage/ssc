@@ -3,6 +3,7 @@ pragma solidity ^0.4.18;
 
 contract SimpleInfo {
 
+
     address owner;
 
     mapping (bytes32 => string) data;
@@ -34,6 +35,7 @@ contract SimpleInfo {
     }
 
 }
+
 
 contract SimpleInfo2 {
 
