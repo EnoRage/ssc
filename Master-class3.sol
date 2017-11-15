@@ -8,16 +8,16 @@ contract MyInfo {
 
     mapping (bytes32 => string) data;
 
-    address owner; // тип переменной адрес, создаем переменную обладатель
+    address owner; // address - new type of variable 
 
     function MyInfo() {
 
-        owner = msg.sender; // присваиваем обладателю адрес создателя контракта, через структуру msg
+        owner = msg.sender; // our variable have an address of contract creator 
         
     }
 
     function setData(string key, string info) {
-        require(msg.sender == owner); // если условие не выполняется, то вылетаем из функции
+        require(msg.sender == owner); // if we don't have true we go from function instantly 
         data[keccak256(key)] = info;
 
     }

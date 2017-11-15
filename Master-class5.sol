@@ -10,21 +10,21 @@ contract Own {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() {   // создали модификатор доступа
+    modifier onlyOwner() {   
         require(msg.sender == owner);
         _;
     }
 
-    function sendNewOwner(address newOwner) onlyOwner { // создаем функцию переопределения владельца 
+    function sendNewOwner(address newOwner) onlyOwner {
         
-        owner = newOwner; // меняем на адрес нового
+        owner = newOwner; 
 
     }
 
 }
 
 
-contract InfoSender is Own { // наследуем контракт доступа 
+contract InfoSender is Own { // Inharitance  
 
     mapping (bytes32 => string) data;
 

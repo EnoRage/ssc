@@ -48,14 +48,14 @@ contract SimpleInfo2 {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() {   // создали модификатор доступа
+    modifier onlyOwner() {   // create a modificator of access
         require(msg.sender == owner);
         _;
     }
 
-    function sendNewOwner(address newOwner) onlyOwner { // создаем функцию переопределения владельца 
+    function sendNewOwner(address newOwner) onlyOwner { // function of owner 
         
-        owner = newOwner; // меняем на адрес нового
+        owner = newOwner; // change address of owner
 
     }
 

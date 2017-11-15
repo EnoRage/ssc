@@ -34,23 +34,23 @@ contract SimpleInfo {
     }
 }
 
-// Каждый раз при добавлени новых данных - требуется новый контракт => создавать новый контракт =>  плохая идея
-// Поэтому решили создать специальный массив, который позволяет по идентификатору (ключу) добавлять новые переменные
-// Ну и вот демонстрация
+// every time when we are trying to add a new string 
+// we need a new contract => it's not effective
+// let's solve that
 
 contract SimpleInfo2 {
 
-    mapping (bytes32 => string) data;  // массив data, в котором  по ключу тип bytes32 существует строка 
+    mapping (bytes32 => string) data;  // Array named data, with key type of bytes32 and string  
     
     function setData(string key, string info) { 
 
-        data[keccak256(key)] = info; // присваиваем по ключу значение 
+        data[keccak256(key)] = info; // we have key and we need to add string info into array by key 
 
     }
     
     function getData(string key) constant returns(string) {
 
-        return data[keccak256(key)]; // возвращаем по ключу значение
-        
+        return data[keccak256(key)]; // return info by key
+
     }
-}
+} 
