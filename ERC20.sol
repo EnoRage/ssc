@@ -27,15 +27,15 @@ contract SimpleTokenCoin is Ownable {
     
     uint32 public constant decimals = 18;
     
-    uint public totalSupply = 0;
+    uint public totalSupply = 0; // Basic amount of money
     
-    mapping (address => uint) balances;
+    mapping (address => uint) balances; // list of balances of our token
     
-    mapping (address => mapping(address => uint)) allowed;
+    mapping (address => mapping(address => uint)) allowed; // list if accounts who are allowed to make operation with account 
     
     function mint(address _to, uint _value) onlyOwner {
-        assert(totalSupply + _value >= totalSupply && balances[_to] + _value >= balances[_to]);
-        balances[_to] += _value;
+        assert(totalSupply + _value >= totalSupply && balances[_to] + _value >= balances[_to]); //assert do the same as require but for internal errors
+        balances[_to] += _value; 
         totalSupply += _value;
     }
     
@@ -44,7 +44,7 @@ contract SimpleTokenCoin is Ownable {
     }
 
     function transfer(address _to, uint _value) returns (bool success) {
-        if(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]) {
+        if(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]) { // check that accouts have that money and there aren't any problems with negative balances on both sides
             balances[msg.sender] -= _value; 
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
