@@ -13,7 +13,7 @@ contract Sale {
 
     uint kof = 60*60*24; //  проеобразуем дни в секунды
 
-    function Sale() {
+    constructor() {
         
         owner = msg.sender;
 

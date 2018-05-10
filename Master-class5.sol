@@ -5,7 +5,7 @@ contract Own {
 
     address owner;
 
-    function Own() {
+    constructor() {
 
         owner = msg.sender;
     }

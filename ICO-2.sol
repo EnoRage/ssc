@@ -16,7 +16,7 @@ contract Sale {
 
     uint interval = 31; // количество дней - длительность нашего ICO
 
-    function Sale() {
+    constructor() {
         
         owner = msg.sender;
 

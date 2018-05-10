@@ -1,5 +1,5 @@
 
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.22;
 
 // Контракт для авторских прав
 contract Ownable {
@@ -7,7 +7,7 @@ contract Ownable {
     address public owner; // Создаём адрес владельца контракта
 
     // Определяем конструктор контракта, где указываем, что владелец контракта тот, кто его первый раз запустил (ваш кэп)
-    function Ownable() public {
+    constructor() public {
         owner = msg.sender;    
     }
 

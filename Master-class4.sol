@@ -8,7 +8,7 @@ contract SimpleInfo {
 
     mapping (bytes32 => string) data;
 
-    function SimpleInfo() {
+    constructor() {
 
         owner = msg.sender;
 

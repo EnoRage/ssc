@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.22;
 
 contract ERC20Basic {
   uint256 public totalSupply;
@@ -107,7 +107,7 @@ contract Ownable {
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-  function Ownable() public {
+  constructor() public {
     owner = msg.sender;
   }
 
@@ -157,7 +157,7 @@ contract Crowdsale {
     
     uint period = 300;
     
-    function Crowdsale() {
+    constructor() {
         owner = msg.sender;
     }
     
