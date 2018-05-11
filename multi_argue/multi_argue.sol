@@ -66,12 +66,13 @@ contract MultiArgue is IMultiArgue {
     mapping (uint256 => mapping (address => uint256)) public investSum;
     mapping (uint256 => mapping (address => uint256)) releasedSum;
     
-    function createArgueVote(uint256 _startTime, uint256 _endTime, address _argueContract) public returns(uint256) {
+    function createArgueVote(uint256 _startTime, uint256 _endTime, uint8 _argueType, address _argueContract) public returns(uint256) {
         uint256 currentArgue = argueCount.add(1);
         startTime[currentArgue] = _startTime;
         endTime[currentArgue] = _endTime;
         argueContract[currentArgue] = _argueContract;
         argueOwner[currentArgue] = msg.sender;
+        argueType[currentArgue] = _argueType;
         argueCount = currentArgue;
         ISimpleArgue simpleArgue_contract = ISimpleArgue(_argueContract);
         simpleArgue_contract.setArgueNum(currentArgue);
