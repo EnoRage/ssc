@@ -40,6 +40,7 @@ library SafeMath {
 }
 
 contract BasicToken is ERC20 {
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -78,14 +79,15 @@ contract BasicToken is ERC20 {
   } 
 
   function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) { 
-      uint oldValue = allowed[msg.sender][_spender]; 
-      if (_subtractedValue > oldValue) {
-        allowed[msg.sender][_spender] = 0;
-      } else {
-        allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
-      }
-      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-      return true;
+    uint oldValue = allowed[msg.sender][_spender]; 
+    if (_subtractedValue > oldValue) {
+      allowed[msg.sender][_spender] = 0;
+    }
+    else {
+      allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
+    }
+    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    return true;
   }
 
   function () public payable {
@@ -113,7 +115,6 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-
 }
 
 contract MintableToken is BasicToken, Ownable {
@@ -151,10 +152,10 @@ contract MintableToken is BasicToken, Ownable {
 
 contract SimpleTokenCoin is MintableToken {
     
-    string public constant name = "Simple Coin Token";
+  string public constant name = "Simple Coin Token";
     
-    string public constant symbol = "SCT";
+  string public constant symbol = "SCT";
     
-    uint32 public constant decimals = 18;
+  uint32 public constant decimals = 18;
     
 }

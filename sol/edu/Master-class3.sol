@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18; 
+pragma solidity ^0.4.22; 
 
 // возникает проблема того, что кто-то может изменить значения в нашем контракте. 
 // Мы хотим, чтобы только мы или нужные нам люди могли это делать.
@@ -6,25 +6,20 @@ pragma solidity ^0.4.18;
 
 contract MyInfo {
 
-    mapping (bytes32 => string) data;
+  mapping (bytes32 => string) data;
 
-    address owner; // тип переменной адрес, создаем переменную обладатель
+  address owner; // тип переменной адрес, создаем переменную обладатель
 
-    function MyInfo() {
+  function MyInfo() {
+    owner = msg.sender; // присваиваем обладателю адрес создателя контракта, через структуру msg    
+  }
 
-        owner = msg.sender; // присваиваем обладателю адрес создателя контракта, через структуру msg
-        
-    }
+  function setData(string key, string info) {
+    require(msg.sender == owner); // если условие не выполняется, то вылетаем из функции
+    data[keccak256(key)] = info;
+  }
 
-    function setData(string key, string info) {
-        require(msg.sender == owner); // если условие не выполняется, то вылетаем из функции
-        data[keccak256(key)] = info;
-
-    }
-
-    function getData(string key) constant returns(string) {
-        return data[keccak256(key)];
-
-    }
-
+  function getData(string key) constant returns(string) {
+    return data[keccak256(key)];
+  }
 }

@@ -1,20 +1,25 @@
 pragma solidity ^0.4.22;
 
 contract ERC20Basic {
+
   uint256 public totalSupply;
   function balanceOf(address who) public constant returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
+
 }
 
 contract ERC20 is ERC20Basic {
+
   function allowance(address owner, address spender) public constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
+
 }
 
 library SafeMath {
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -37,9 +42,11 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+
 }
 
 contract BasicToken is ERC20 {
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -80,20 +87,21 @@ contract BasicToken is ERC20 {
   } 
    
   function increaseApproval (address _spender, uint _addedValue) public returns (bool success) { 
-      allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue); 
-      Approval(msg.sender, _spender, allowed[msg.sender][_spender]); 
-      return true; 
+    allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue); 
+    Approval(msg.sender, _spender, allowed[msg.sender][_spender]); 
+    return true; 
   } 
 
   function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) { 
-      uint oldValue = allowed[msg.sender][_spender]; 
-      if (_subtractedValue > oldValue) {
-        allowed[msg.sender][_spender] = 0;
-      } else {
-        allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
-      }
-      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-      return true;
+    uint oldValue = allowed[msg.sender][_spender]; 
+    if (_subtractedValue > oldValue) {
+      allowed[msg.sender][_spender] = 0;
+    } 
+    else {
+      allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
+    }
+    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    return true;
   }
 
   function () public payable {
@@ -139,32 +147,29 @@ contract MintableToken is BasicToken, Ownable {
 
 contract SimpleTokenCoin is MintableToken {
     
-    string public constant name = "Simple Coin Token";
-    
-    string public constant symbol = "SCT";
-    
-    uint32 public constant decimals = 18;
+  string public constant name = "Simple Coin Token";
+  string public constant symbol = "SCT";  
+  uint32 public constant decimals = 18;
     
 }
 
 contract Crowdsale {
     
-    address owner;
+  address owner;
     
-    SimpleTokenCoin public token = new SimpleTokenCoin();
+  SimpleTokenCoin public token = new SimpleTokenCoin();
     
-    uint start = 1500379200;
+  uint start = 1500379200; 
+  uint period = 300;
     
-    uint period = 300;
+  constructor() {
+    owner = msg.sender;
+  }
     
-    constructor() {
-        owner = msg.sender;
-    }
-    
-    function() external payable {
-        require(now > start && now < start + period*24*60*60);
-        owner.transfer(msg.value);
-        token.mint(msg.sender, msg.value);
-    }
+  function() external payable {
+    require(now > start && now < start + period*24*60*60);
+      owner.transfer(msg.value);
+      token.mint(msg.sender, msg.value);
+  }
     
 }

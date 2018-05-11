@@ -1,41 +1,34 @@
-pragma solidity ^0.4.18; 
-
+pragma solidity ^0.4.22; 
 
 contract Own {
 
-    address owner;
+  address owner;
 
-    constructor() {
+  constructor() {
+    owner = msg.sender;
+  }
 
-        owner = msg.sender;
-    }
+  modifier onlyOwner() {   // создали модификатор доступа
+    require(msg.sender == owner);
+    _;
+  }
 
-    modifier onlyOwner() {   // создали модификатор доступа
-        require(msg.sender == owner);
-        _;
-    }
-
-    function sendNewOwner(address newOwner) onlyOwner { // создаем функцию переопределения владельца 
-        
-        owner = newOwner; // меняем на адрес нового
-
-    }
+  function sendNewOwner(address newOwner) onlyOwner { // создаем функцию переопределения владельца       
+    owner = newOwner; // меняем на адрес нового
+  }
 
 }
 
 
 contract InfoSender is Own { // наследуем контракт доступа 
 
-    mapping (bytes32 => string) data;
+  mapping (bytes32 => string) data;
 
-    function setData(string key, string info) onlyOwner {
+  function setData(string key, string info) onlyOwner {
+    data[keccak256(key)] = info; 
+  }
 
-        data[keccak256(key)] = info; 
-
-    }
-
-    function getData(string key) constant returns(string) {
-
-        return data[keccak256(key)];
-    }
+  function getData(string key) constant returns(string) {
+    return data[keccak256(key)];
+  }
 }
