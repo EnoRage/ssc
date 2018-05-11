@@ -27,3 +27,6 @@
         
     3) Ganache
         http://truffleframework.com/ganache/
+        
+    4) Web3
+        npm i -s web3
