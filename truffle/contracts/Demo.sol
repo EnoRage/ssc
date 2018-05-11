@@ -61,7 +61,7 @@ contract BasicToken is ERC20 {
     require(_value <= balances[msg.sender]);
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
-    Transfer(msg.sender, _to, _value);
+    emit Transfer(msg.sender, _to, _value);
     return true;
   }
 
@@ -72,13 +72,13 @@ contract BasicToken is ERC20 {
     balances[_from] = balances[_from].sub(_value); 
     balances[_to] = balances[_to].add(_value); 
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value); 
-    Transfer(_from, _to, _value); 
+    emit Transfer(_from, _to, _value); 
     return true; 
   } 
 
   function approve(address _spender, uint256 _value) public returns (bool) { 
     allowed[msg.sender][_spender] = _value; 
-    Approval(msg.sender, _spender, _value); 
+    emit Approval(msg.sender, _spender, _value); 
     return true; 
   }
 
@@ -88,7 +88,7 @@ contract BasicToken is ERC20 {
    
   function increaseApproval (address _spender, uint _addedValue) public returns (bool success) { 
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue); 
-    Approval(msg.sender, _spender, allowed[msg.sender][_spender]); 
+    emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]); 
     return true; 
   } 
 
@@ -100,7 +100,7 @@ contract BasicToken is ERC20 {
     else {
       allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
     }
-    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
@@ -126,7 +126,7 @@ contract Ownable {
 
   function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
-    OwnershipTransferred(owner, newOwner);
+    emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
 
@@ -139,7 +139,7 @@ contract MintableToken is BasicToken, Ownable {
   function mint(address _to, uint256 _amount) public returns (bool) {
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
-    Mint(_to, _amount);
+    emit Mint(_to, _amount);
     return true;
   }
   
@@ -150,26 +150,5 @@ contract SimpleTokenCoin is MintableToken {
   string public constant name = "Simple Coin Token";
   string public constant symbol = "SCT";  
   uint32 public constant decimals = 18;
-    
-}
-
-contract Crowdsale {
-    
-  address owner;
-    
-  SimpleTokenCoin public token = new SimpleTokenCoin();
-    
-  uint start = 1500379200; 
-  uint period = 300;
-    
-  constructor() {
-    owner = msg.sender;
-  }
-    
-  function() external payable {
-    require(now > start && now < start + period*24*60*60);
-      owner.transfer(msg.value);
-      token.mint(msg.sender, msg.value);
-  }
     
 }
