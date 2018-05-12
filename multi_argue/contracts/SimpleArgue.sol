@@ -28,9 +28,9 @@ contract SimpleArgue is ISimpleArgue {
     address public multiArgueContractAddress;
     uint256 public argueNum;
     
-    constructor() {
+    constructor(address _multiArgueContractAddress) {
         owner = msg.sender;
-        multiArgueContractAddress = 0xe1bf14ec1e5d85b63f4adb24fc6a171091fa8d40;
+        multiArgueContractAddress = _multiArgueContractAddress;
     }
     
     function () payable {
