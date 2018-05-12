@@ -1,4 +1,4 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.23;
 
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -158,41 +158,5 @@ contract MultiArgue is IMultiArgue {
         releasedSum[_argueNum][msg.sender] = releasedSum[_argueNum][msg.sender].add(_value);
         emit ReleaseInterest(_argueNum, msg.sender, _value);
         return true;  
-    }
-}
-
-contract SimpleArgue is ISimpleArgue {
-    address owner;
-    address public multiArgueContractAddress;
-    uint256 public argueNum;
-    
-    constructor() {
-        owner = msg.sender;
-        multiArgueContractAddress = 0x0c2e77121daf0270d26bf0a7e9ab0faa8bf739ef;
-    }
-    
-    function () payable {
-        IMultiArgue multiArgue_contract = IMultiArgue(multiArgueContractAddress);
-        require(multiArgue_contract.getVote(argueNum, msg.sender) == 0);
-        multiArgue_contract.setInvestSum(argueNum, msg.sender, msg.value);
-    }
-    
-    function setArgueNum(uint256 _argueNum) public returns(bool) {
-        require(msg.sender == multiArgueContractAddress);
-        argueNum = _argueNum;
-        return true;
-    }
-    
-    function setWinners(uint8 _winner) public returns(bool) {
-        require(msg.sender == owner);
-        IMultiArgue multiArgue_contract = IMultiArgue(multiArgueContractAddress);
-        multiArgue_contract.setWinners(argueNum, _winner);
-        return true;
-    }
-    
-    function pay(address _reciever, uint256 _value) public returns(bool) {
-        require(msg.sender == multiArgueContractAddress);
-        _reciever.transfer(_value);
-        return true;
     }
 }
