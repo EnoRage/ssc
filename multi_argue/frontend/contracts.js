@@ -1,6 +1,13 @@
+
 var MultiArgue = web3.eth.contract(CONTRACT1_ABI_ARRAY);
-var MultiArgueInstance = contract.at(CONTRACT1_ADDRESS);
+var MultiArgueInstance = MultiArgue.at(CONTRACT1_ADDRESS);
 
-var SimpleToken = web3.eth.contract(CONTRACT2_ABI_ARRAY);
-var SimpleTokenInstance = contract.at(CONTRACT2_ADDRESS);
+var SimpleArgue = web3.eth.contract(CONTRACT2_ABI_ARRAY);
+var SimpleArgueInstance = SimpleArgue.at(CONTRACT2_ADDRESS);
 
+function createArgue(prvtKey, endTime, argueType, simpleArgueAddress) {
+    let account = addAccount(prvtKey);
+    MultiArgueInstance.createArgueVote(Number(endTime), Number(argueType), simpleArgueAddress, {from: account}, (err, txHash) => {
+        console.log(txHash);
+    });
+}
