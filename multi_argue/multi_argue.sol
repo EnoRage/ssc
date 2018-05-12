@@ -13,7 +13,7 @@ library SafeMath {
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
 
@@ -30,26 +30,35 @@ library SafeMath {
 }
 
 contract IMultiArgue {
-    function createArgueVote(uint256 _startTime, uint256 _endTime, address _argueContract) public returns(uint256);
-    function approveAddress(uint256 _argueNum, address _approvedAddress) public returns(bool);
+    function createArgueVote(uint256 _endTime, uint8 _argueType, address _argueContract) public returns(uint256);
+    function approvedAddress(uint256 _argueNum, address _approvedAddress) public returns(bool);
     function setInvestSum(uint256 _argueNum, address _sender, uint256 _investSum) public returns(bool);
     function vote(uint256 _argueNum, uint8 _vote) public returns(bool);
     function getVote(uint256 _argueNum, address _voter) public view returns(uint8);
-    function getGane(uint256 _argueNum) public view returns(uint256);
+    function getGain(uint256 _argueNum) public view returns(uint256);
     function setWinners(uint256 _argueNum, uint8 _winner) public returns(bool);
     function releaseInterest(uint256 _argueNum, uint256 _value) public returns(bool);
     
-    event CreateArgueVote(uint256 indexed argueNum, address creator);
-    event ApproveAddress(uint256 indexed argueNum, address indexed approveAddress);
-    event Vote(uint256 indexed argueNum, address indexed voter,uint8 indexed vote);
+    event CreateArgueVote(uint256 indexed argueNum, address indexed creater);
+    event ApproveAddress(uint256 indexed argueNum, address indexed approvedAddress);
+    event Vote(uint256 indexed argueNum, address indexed voter, uint8 indexed vote);
     event SetWinners(uint256 indexed argueNum, uint8 indexed winner);
     event ReleaseInterest(uint256 indexed argueNum, address indexed reciever, uint256 indexed value);
 }
 
+contract ISimpleArgue {
+    function setArgueNum(uint256 _argueNum) public returns(bool);
+    function setWinners(uint8 _winner) public returns(bool);
+    function pay(address _reciever, uint256 _value) public returns(bool);
+}
+
 contract MultiArgue is IMultiArgue {
     using SafeMath for uint256;
-
+    
     uint256 argueCount;
+    uint8 constant NO_VOTE = 0;
+    uint8 constant VOTE_NO = 1;
+    uint8 constant VOTE_YES = 2;
     
     mapping (uint256 => uint256) startTime;
     mapping (uint256 => uint256) endTime;
@@ -66,21 +75,22 @@ contract MultiArgue is IMultiArgue {
     mapping (uint256 => mapping (address => uint256)) public investSum;
     mapping (uint256 => mapping (address => uint256)) releasedSum;
     
-    function createArgueVote(uint256 _startTime, uint256 _endTime, uint8 _argueType, address _argueContract) public returns(uint256) {
-        uint256 currentArgue = argueCount.add(1);
-        startTime[currentArgue] = _startTime;
-        endTime[currentArgue] = _endTime;
-        argueContract[currentArgue] = _argueContract;
-        argueOwner[currentArgue] = msg.sender;
-        argueType[currentArgue] = _argueType;
-        argueCount = currentArgue;
+    function createArgueVote(uint256 _endTime, uint8 _argueType, address _argueContract) public returns(uint256) {
+        uint256 currenctArgue = argueCount.add(1);
+        startTime[currenctArgue] = now;
+        endTime[currenctArgue] = _endTime;
+        argueContract[currenctArgue] = _argueContract;
+        address owner = msg.sender;
+        argueOwner[currenctArgue] = owner;
+        argueType[currenctArgue] = _argueType;
+        argueCount = currenctArgue;
         ISimpleArgue simpleArgue_contract = ISimpleArgue(_argueContract);
-        simpleArgue_contract.setArgueNum(currentArgue);
-        emit CreateArgueVote(currentArgue, msg.sender);
-        return currentArgue;
+        simpleArgue_contract.setArgueNum(currenctArgue);
+        emit CreateArgueVote(currenctArgue, owner);
+        return currenctArgue;
     }
     
-    function approveAddress(uint256 _argueNum, address _approvedAddress) public returns(bool) {
+    function approvedAddress(uint256 _argueNum, address _approvedAddress) public returns(bool) {
         require(msg.sender == argueOwner[_argueNum]);
         approvedAddress[_argueNum][_approvedAddress] = true;
         emit ApproveAddress(_argueNum, _approvedAddress);
@@ -98,16 +108,17 @@ contract MultiArgue is IMultiArgue {
         if (argueType[_argueNum] == 1) {
             require(approvedAddress[_argueNum][msg.sender] == true);
         }
-        require(votes[_argueNum][msg.sender] == 0);
-        require(_vote == 1 || _vote == 2);
+        require(votes[_argueNum][msg.sender] == NO_VOTE);
+        require(_vote == VOTE_YES || _vote == VOTE_NO);
         uint256 _investSum = investSum[_argueNum][msg.sender];
-        if (_vote == 1) {
+        require(_investSum > 0);
+        if (_vote == VOTE_NO) {
             totalInvestSumNo[_argueNum] = totalInvestSumNo[_argueNum].add(_investSum);
         } else {
             totalInvestSumYes[_argueNum] = totalInvestSumYes[_argueNum].add(_investSum);
         }
-        votes[_argueNum][msg.sender] = _vote; 
-        emit Vote(_argueNum, msg.sender,_vote);
+        votes[_argueNum][msg.sender] = _vote;
+        emit Vote(_argueNum, msg.sender, _vote);
         return true;
     }
     
@@ -118,19 +129,16 @@ contract MultiArgue is IMultiArgue {
     
     function getGain_(uint256 _argueNum, address _reciever) internal view returns(uint256) {
         require(votes[_argueNum][msg.sender] == voteWin[_argueNum]);
-        if (voteWin[_argueNum] == 1) {
-            return  investSum[_argueNum][_reciever].mul(totalInvestSumNo[_argueNum].add(totalInvestSumYes[_argueNum])).div(totalInvestSumNo[_argueNum]).sub(releasedSum[_argueNum][_reciever]);
+        if (voteWin[_argueNum] == VOTE_NO) {
+            return investSum[_argueNum][_reciever].mul(totalInvestSumNo[_argueNum].add(totalInvestSumYes[_argueNum])).div(totalInvestSumNo[_argueNum]).sub(releasedSum[_argueNum][_reciever]);
         } else {
-            return  investSum[_argueNum][_reciever].mul(totalInvestSumNo[_argueNum].add(totalInvestSumYes[_argueNum])).div(totalInvestSumYes[_argueNum]).sub(releasedSum[_argueNum][_reciever]);
+            return investSum[_argueNum][_reciever].mul(totalInvestSumNo[_argueNum].add(totalInvestSumYes[_argueNum])).div(totalInvestSumYes[_argueNum]).sub(releasedSum[_argueNum][_reciever]);
         }
     }
     
-    function getGane(uint256 _argueNum) public view returns(uint256) {
-        if (now > endTime[_argueNum]) {
-            return getGain_(_argueNum, msg.sender);
-        } else {
-            return 0;
-        } 
+    function getGain(uint256 _argueNum) public view returns(uint256) {
+        require(now > endTime[_argueNum]);
+        return getGain_(_argueNum, msg.sender);
     }
     
     function setWinners(uint256 _argueNum, uint8 _winner) public returns(bool) {
@@ -141,7 +149,7 @@ contract MultiArgue is IMultiArgue {
         return true;
     }
     
-     function releaseInterest(uint256 _argueNum, uint256 _value) public returns(bool) {
+    function releaseInterest(uint256 _argueNum, uint256 _value) public returns(bool) {
         require(now >= endTime[_argueNum]);
         require(votes[_argueNum][msg.sender] == voteWin[_argueNum]);
         require(getGain_(_argueNum, msg.sender) > 0);
@@ -149,47 +157,41 @@ contract MultiArgue is IMultiArgue {
         simpleArgue_contract.pay(msg.sender, _value);
         releasedSum[_argueNum][msg.sender] = releasedSum[_argueNum][msg.sender].add(_value);
         emit ReleaseInterest(_argueNum, msg.sender, _value);
-        return true;
+        return true;  
     }
 }
 
-contract ISimpleArgue {
-    function setArgueNum(uint256 _argueNum) public returns(bool);
-    function setWinners(uint8 _winner) public returns(bool);
-    function pay(address _reciever, uint256 _value) public returns(bool);
-}
-
-contract SimpleArgue {
+contract SimpleArgue is ISimpleArgue {
     address owner;
-    address multiArgueContract;
+    address public multiArgueContractAddress;
     uint256 public argueNum;
     
     constructor() {
         owner = msg.sender;
-        multiArgueContract = 0x038f160ad632409bfb18582241d9fd88c1a072ba;
+        multiArgueContractAddress = 0x0c2e77121daf0270d26bf0a7e9ab0faa8bf739ef;
     }
     
     function () payable {
-        IMultiArgue multiArgue_contract = IMultiArgue(multiArgueContract); 
+        IMultiArgue multiArgue_contract = IMultiArgue(multiArgueContractAddress);
         require(multiArgue_contract.getVote(argueNum, msg.sender) == 0);
         multiArgue_contract.setInvestSum(argueNum, msg.sender, msg.value);
     }
     
     function setArgueNum(uint256 _argueNum) public returns(bool) {
-        require(msg.sender == multiArgueContract);
+        require(msg.sender == multiArgueContractAddress);
         argueNum = _argueNum;
         return true;
     }
     
     function setWinners(uint8 _winner) public returns(bool) {
         require(msg.sender == owner);
-        IMultiArgue multiArgue_contract = IMultiArgue(multiArgueContract); 
+        IMultiArgue multiArgue_contract = IMultiArgue(multiArgueContractAddress);
         multiArgue_contract.setWinners(argueNum, _winner);
         return true;
     }
     
     function pay(address _reciever, uint256 _value) public returns(bool) {
-        require(msg.sender == multiArgueContract);
+        require(msg.sender == multiArgueContractAddress);
         _reciever.transfer(_value);
         return true;
     }
