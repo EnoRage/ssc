@@ -114,7 +114,7 @@ contract CarsMarket is ICarMarket {
             uint _carOwnerID = carOwner[msg.sender];
             CarOwner storage _carOwner = carOwners[_carOwnerID];
             if (_carOwner.discount > 0)
-                _carPrice = _carPrice.mul(DECIMAL_MULTIPLIER).div(_carOwner.discount);
+                _carPrice = _carPrice.sub(_carPrice.mul(_carOwner.discount).div(DECIMAL_MULTIPLIER));
             require(msg.value >= _carPrice);
             require(_carOwner.carIDs[MAX_CARS_PER_PERSON-1] == NULL_CAR);
             for (uint i = 0; i < MAX_CARS_PER_PERSON; i++) {
