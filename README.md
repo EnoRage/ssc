@@ -77,3 +77,24 @@ f. Next you should use loop for adding new car ID for `_carOwner`.
 
 9. Buyer can send more ETH than is the car worth. You should calculate remain value out of conditional statement like `msg.value` without `_carPrice`.
 10. And if remain value more than zero return remain ETH to car buyer.
+
+### Task 6: Getter function
+You have to create `getOwnerCars` function that will returns all cars which `carOwner` has already buy.
+
+### Task 7: Events
+Create:
+```javascript
+ event AddCar(address carDiller, uint carID);
+ event NewCarOwner(uint carOnwerID, address carOwnerAddress);
+ event BuyCar(uint carID, uint carOwnerID);
+```
+And arrange it in the right places.
+
+___
+
+### Additional assignment
+Create `setCarOwnerDiscount` and `editPresence` functions.
+Create Interface `ICarMarket`.    
+Add here all constant variables modifiers and functions without body.
+Inherit `CarMarket` contract from `ICarMarket` interface.
+
