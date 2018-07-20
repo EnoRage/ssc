@@ -59,7 +59,7 @@ Let's start to code our `buyCar` function:
 7. Let's check: if `msg.sender` buy car at first time.
 **Prompt:** remember the `isCarOwner` variable and `NOT_CAR_OWNER` person state.
 
-8.1. Let's start with person who has never bought a car.
+8. Let's start with person who has never bought a car.
 1. Check if send ETH >= `_carPrice`.
 2. Create local variable `_newCarOwnerID` with value `carOwnerID`.
 3. Now person has bought a car. Set CAR_OWNER state.
@@ -68,7 +68,7 @@ Let's start to code our `buyCar` function:
 6. Add buyer to `carOwner` variable.
 7. Increment `carOwnerID`.
 
-8.2. What about person who has already bought a car:
+What about person who has already bought a car:
 1. Create `_carOwnerID` local variable with value of `carOwner` unique identifier.
 2. Create variable `_carOwner` - instance of `CarOwner` with `_carOwnerID` unique identifier.
 3. Check `discount` of buyer. If it's more than zero than calculate new `carPrice` given the discount. **Prompt:** Get `_carPrice` and subtract it from (`_carPrice` multiply by discount and divide by DECIMAL_MULTIPLIER). Discount should equal from `1e16` to `1e18` because solidity doesn't have floating-point numbers.
