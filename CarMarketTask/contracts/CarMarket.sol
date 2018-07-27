@@ -36,10 +36,10 @@ contract ICarMarket {
     bool constant internal IN_STOCK = true;
     bool constant internal OUT_OF_STOCK = false;
 
-    address public carDiller;
+    address public carDealer;
 
-    modifier onlyCarDiller() {
-        require(carDiller == msg.sender);
+    modifier onlyCarDealer() {
+        require(carDealer == msg.sender);
         _;
     }
 
@@ -52,30 +52,30 @@ contract ICarMarket {
         uint _petrolConsumptionPerMile,
         bytes32 _signature,
         bool _presence
-    ) external returns  (bool);
+    ) external returns (uint);
     function setCarOwnerDiscount(uint _carOwnerID, uint _discount) external returns (bool);
     function getOwnerCars(uint _carOwnerID) external view returns (uint[MAX_CARS_PER_PERSON]);
     function editPresence(uint _carID, bool _presence) external returns (bool);
 
-    event AddCar(address carDiller, uint carID);
+    event AddCar(address carDealer, uint carID);
     event NewCarOwner(uint carOnwerID, address carOwnerAddress);
     event BuyCar(uint carID, uint carOwnerID);
     event SetDiscount(uint carOwnerID, uint discount);
     event EditPresence(uint carID, bool presence);
 }
 
-contract CarsMarket is ICarMarket {
+contract CarMarket is ICarMarket {
     using SafeMath for uint256;
 
     uint carID = 1;
     uint carOwnerID = 1;
     mapping (uint => Car) public cars;
     mapping (uint => CarOwner) public carOwners;
-    mapping (address => uint) carOwner;
-    mapping (address => uint8) isCarOwner;
+    mapping (address => uint) public carOwner;
+    mapping (address => uint8) public isCarOwner;
 
     constructor () public {
-        carDiller = msg.sender;
+        carDealer = msg.sender;
     }
 
     struct CarOwner {
@@ -94,27 +94,28 @@ contract CarsMarket is ICarMarket {
     }
 
     function buyCar(uint _carID) payable public {
-        require(carDiller != msg.sender);
+        require(carDealer != msg.sender);
         require(_carID != NULL_CAR);
         require(_carID < carID);
         Car storage c = cars[_carID];
         require(c.presence == IN_STOCK);
         uint _carPrice = c.price;
+        uint _carOwnerID;
         if (isCarOwner[msg.sender] == NOT_CAR_OWNER) {
             require(msg.value >= _carPrice);
-            uint _newCarOwnerID = carOwnerID;
+            _carOwnerID = carOwnerID;
             isCarOwner[msg.sender] = CAR_OWNER;
-            CarOwner storage _newCarOwner = carOwners[_newCarOwnerID];
+            CarOwner storage _newCarOwner = carOwners[_carOwnerID];
             _newCarOwner.addr = msg.sender;
             _newCarOwner.carIDs = [_carID];
-            carOwner[msg.sender] = _newCarOwnerID;
-            emit NewCarOwner(_newCarOwnerID, msg.sender);
+            carOwner[msg.sender] = _carOwnerID;
+            emit NewCarOwner(_carOwnerID, msg.sender);
             carOwnerID = carOwnerID.add(0x1);
         } else {
-            uint _carOwnerID = carOwner[msg.sender];
+            _carOwnerID = carOwner[msg.sender];
             CarOwner storage _carOwner = carOwners[_carOwnerID];
             if (_carOwner.discount > 0)
-                _carPrice = _carPrice.mul(DECIMAL_MULTIPLIER).div(_carOwner.discount);
+                _carPrice = _carPrice.sub(_carPrice.mul(_carOwner.discount).div(DECIMAL_MULTIPLIER));
             require(msg.value >= _carPrice);
             require(_carOwner.carIDs[MAX_CARS_PER_PERSON-1] == NULL_CAR);
             for (uint i = 0; i < MAX_CARS_PER_PERSON; i++) {
@@ -138,8 +139,9 @@ contract CarsMarket is ICarMarket {
         uint _petrolConsumptionPerMile,
         bytes32 _signature,
         bool _presence
-    ) external onlyCarDiller returns  (bool) {
-        Car storage c = cars[carID];
+    ) external onlyCarDealer returns (uint) {
+        uint _carIF = carID;
+        Car storage c = cars[_carIF];
         c.price = _price;
         c.manufacturer = _manufacturer;
         c.configOfModel[keccak256(abi.encodePacked(_model))] = _config;
@@ -147,11 +149,16 @@ contract CarsMarket is ICarMarket {
         c.signature = _signature;
         c.presence = _presence;
         emit AddCar(msg.sender, carID);
-        carID = carID.add(0x1);
+        carID = _carIF.add(0x1);
+        return _carIF;
+    }
+
+    function releaseETH() external onlyCarDealer returns (bool) {
+        carDealer.transfer(address(this).balance);
         return true;
     }
 
-    function setCarOwnerDiscount(uint _carOwnerID, uint _discount) external onlyCarDiller returns (bool) {
+    function setCarOwnerDiscount(uint _carOwnerID, uint _discount) external onlyCarDealer returns (bool) {
         require(_discount >= DECIMAL_MULTIPLIER/100 && _discount <= DECIMAL_MULTIPLIER);
         require(_carOwnerID < carID);
         carOwners[_carOwnerID].discount = _discount;
@@ -159,7 +166,7 @@ contract CarsMarket is ICarMarket {
         return true;
     }
 
-    function editPresence(uint _carID, bool _presence) external onlyCarDiller returns (bool) {
+    function editPresence(uint _carID, bool _presence) external onlyCarDealer returns (bool) {
         Car storage c = cars[_carID];
         require(c.presence != _presence);
         c.presence = _presence;
